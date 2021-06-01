@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require_relative 'strato_api'
+require 'securerandom'
+require 'colorize'
+
+unless ARGV.length == 3
+  puts 'Usage: ./test_strato_scripts <username> <password> <domain to test with>'
+  exit -1
+end
+
+username = ARGV[0]
+password = ARGV[1]
+domain = ARGV[2]
+subdomain = "strato-script-test.#{domain}"
+
+strato_api = StratoAPI.new(username, password)
+strato_api.debug_prefix = '    '
+
+test_name = 'test-txt-record'
+test_value = SecureRandom.hex
+
+
+puts "Testing for domain #{domain}".light_blue
+puts '  Setting test TXT record'.yellow
+strato_api.set_txt_on_domain(domain: domain, name: test_name, value: test_value)
+
+puts '  Validating that the record has been set ...'.yellow
+unless strato_api.wait_for_record(domain: domain, name: test_name, value: test_value)
+  puts "TXT record could not be validated, quitting.".red
+  exit -1
+end
+puts '  Validating successful'
+
+puts '  Removing the record'.yellow
+strato_api.remove_txt_on_domain(domain: domain, name: test_name)
+
+
+puts "Testing for subdomain #{subdomain}".light_blue
+puts '  Creating subdomain and setting test TXT record'.yellow
+strato_api.set_txt_on_domain(domain: subdomain, name: test_name, value: test_value)
+
+puts '  Validating that the record has been set ...'.yellow
+unless strato_api.wait_for_record(domain: subdomain, name: test_name, value: test_value)
+  puts "TXT record could not be validated, quitting.".red
+  exit -1
+end
+puts '  Validating successful'
+
+puts '  Removing the record'.yellow
+strato_api.remove_txt_on_domain(domain: subdomain, name: test_name)
+puts '  Removing the subdomain'.yellow
+strato_api.remove_subdomain(subdomain: subdomain)
+
+
+
+puts "Everything is fine.".green

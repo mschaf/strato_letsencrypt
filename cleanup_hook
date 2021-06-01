@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'json'
+require_relative 'strato_api'
+
+
+username = ENV['STRATO_USERNAME']
+password = ENV['STRATO_PASSWORD']
+domain = ENV['CERTBOT_DOMAIN']
+auth_script_output = ENV['CERTBOT_AUTH_OUTPUT']
+
+auth_script_status = {}
+
+if username.nil?
+  puts 'Strato username not found, provide it in the STRATO_USERNAME environment variable, quitting'
+  exit -1
+end
+
+if password.nil?
+  puts 'Strato password not found, provide it in the STRATO_PASSWORD environment variable, quitting'
+  exit -1
+end
+
+begin
+  auth_script_status.merge!(JSON.parse(auth_script_output.split("\n").last ) )
+rescue
+  puts 'Failed to read status from auth script, quitting'
+  exit -1
+end
+
+if domain.nil?
+  puts 'Domain not found, quitting'
+  exit -1
+end
+
+strato_api = StratoAPI.new(username, password)
+
+if auth_script_status['subdomain_created']
+  puts 'Subdomain was just created, removing again'
+  strato_api.remove_subdomain(subdomain: domain)
+else
+  puts 'Subdomain already existed before, just removing txt record'
+  strato_api.remove_txt_on_domain(domain: domain, name: '_acme-challenge')
+end

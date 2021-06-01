@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'json'
+require_relative 'strato_api'
+
+
+username = ENV['STRATO_USERNAME']
+password = ENV['STRATO_PASSWORD']
+domain = ENV['CERTBOT_DOMAIN']
+challenge = ENV['CERTBOT_VALIDATION']
+
+if username.nil?
+  puts 'Strato username not found, provide it in the STRATO_USERNAME environment variable, quitting'
+  exit -1
+end
+
+if password.nil?
+  puts 'Strato password not found, provide it in the STRATO_PASSWORD environment variable, quitting'
+  exit -1
+end
+
+if domain.nil?
+  puts 'Domain not found, quitting'
+  exit -1
+end
+
+if challenge.nil?
+  puts 'Challenge not found, quitting'
+  exit -1
+end
+
+strato_api = StratoAPI.new(username, password)
+
+creation_result = strato_api.set_txt_on_domain(domain: domain, name: '_acme-challenge', value: challenge)
+
+record_set = strato_api.wait_for_record(domain: domain, name: '_acme-challenge', value: challenge)
+
+unless record_set
+  exit -1
+end
+
+puts 'Status for cleanup script:'
+puts creation_result.to_json
