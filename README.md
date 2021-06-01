@@ -1,4 +1,4 @@
-## Scripts to automatically add TXT on domains hosted on Strato
+## Scripts to automatically add TXT records on domains hosted on Strato
 
 Some scripts to automate the Let´s Encrypt DNS challenge for domains hosted on strato.  
 By far not the best solution, this literally clicks through the strato website inside a headless browser to do this. But if your stuck with strato for some reason, this might be an option. If you can, use a dns provider with an API supported by Let´s Encrypt. An overview can be found here: https://community.letsencrypt.org/t/dns-providers-who-easily-integrate-with-lets-encrypt-dns-validation/86438
@@ -14,7 +14,7 @@ By far not the best solution, this literally clicks through the strato website i
 ### Getting Certificates
 
 Example command for getting a certificate for `test.example.com`  
-`STRATO_USERNAME=<username> STRATO_PASSWORD=<password> certbot --preferred-challenges dns --manual --manual-auth-hook ./auth_hook --manual-cleanup-hook ./cleanup_hook --agree-tos --manual-public-ip-logging-ok -d test.example.com certonly`
+`STRATO_USERNAME=<username> STRATO_PASSWORD=<password> certbot --preferred-challenges dns --manual --manual-auth-hook ./auth_hook --manual-cleanup-hook ./cleanup_hook --agree-tos --manual-public-ip-logging-ok -d test.example.com certonly`  
 The important part for these scripts is `--manual --manual-auth-hook ./auth_hook --manual-cleanup-hook ./cleanup_hook`
 
 ### Testing
