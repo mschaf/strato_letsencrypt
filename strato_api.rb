@@ -73,7 +73,7 @@ class StratoAPI
     domain_box.click_on('verwalten')
 
     sleep 1
-    @session.find('h4', text: 'Subdomain löschen').click
+    @session.find('h5', text: 'Subdomain löschen').click
     sleep 1
     @session.find('a', text: 'Subdomain löschen', class: 'btn').click
 
@@ -189,7 +189,7 @@ class StratoAPI
       @session.find('a', text: 'DNS Einstellungen', class: 'accordion-toggle').click
     end
     sleep 1
-    @session.find('li', text: 'TXT Records inklusive SPF und DKIM Einstellungen').click_on('verwalten')
+    @session.find('li', text: 'TXT und CNAME Records inklusive SPF und DKIM Einstellungen').click_on('verwalten')
     name_input = begin
       @session.find(:css, "input[name='prefix'][value='#{name}']")
     rescue Capybara::ElementNotFound
@@ -224,7 +224,7 @@ class StratoAPI
       @session.find('a', text: 'DNS Einstellungen', class: 'accordion-toggle').click
     end
     sleep 1
-    @session.find('li', text: 'TXT Records inklusive SPF und DKIM Einstellungen').click_on('verwalten')
+    @session.find('li', text: 'TXT und CNAME Records inklusive SPF und DKIM Einstellungen').click_on('verwalten')
     sleep 1
 
     name_input = begin
